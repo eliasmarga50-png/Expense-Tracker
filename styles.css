@@ -457,3 +457,35 @@ td.expense {
     color: #b91c1c;
     background: #fee2e2;
 }
+
+
+
+/* =================================
+   COMMIT 3: CATEGORY SPENDING
+================================= */
+
+.category-item {
+    margin-bottom: 18px;
+}
+
+.category-info {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 7px;
+}
+
+.category-track {
+    height: 12px;
+    width: 100%;
+    background: #e5e7eb;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.category-bar {
+    height: 100%;
+    background: #3498db;
+    border-radius: inherit;
+    transition: width 0.3s ease;
+}

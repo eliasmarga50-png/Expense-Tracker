@@ -247,3 +247,195 @@ $("transactionTableBody").addEventListener(
     "click",
     handleTransactionAction
 );
+
+
+
+/* =================================
+   COMMIT 3: FINANCIAL DASHBOARD
+================================= */
+
+function getTotals() {
+    const income = transactions
+        .filter(t => t.type === "income")
+        .reduce((total, t) => total + t.amount, 0);
+
+    const expenses = transactions
+        .filter(t => t.type === "expense")
+        .reduce((total, t) => total + t.amount, 0);
+
+    return {
+        income,
+        expenses,
+        balance: income - expenses
+    };
+}
+
+
+// =================================
+// Current Month Expenses
+// =================================
+
+function getCurrentMonthExpenses() {
+    const now = new Date();
+
+    return transactions
+        .filter(t => {
+            if (t.type !== "expense") return false;
+
+            const transactionDate = new Date(
+                t.date + "T00:00:00"
+            );
+
+            return transactionDate.getMonth() === now.getMonth()
+                && transactionDate.getFullYear() === now.getFullYear();
+        })
+        .reduce((total, t) => total + t.amount, 0);
+}
+
+
+// =================================
+// Dashboard Update
+// =================================
+
+function updateDashboard() {
+    const totals = getTotals();
+
+    $("totalIncome").textContent = money(totals.income);
+    $("totalExpenses").textContent = money(totals.expenses);
+    $("balance").textContent = money(totals.balance);
+    $("budgetAmount").textContent = money(monthlyBudget);
+
+    updateBudgetUI();
+    updateStatistics();
+    renderCategorySpending();
+}
+
+
+// =================================
+// Budget UI
+// =================================
+
+function updateBudgetUI() {
+    const spent = getCurrentMonthExpenses();
+    const remaining = monthlyBudget - spent;
+
+    $("budgetSpent").textContent = money(spent);
+    $("budgetRemaining").textContent = money(remaining);
+
+    if (monthlyBudget <= 0) {
+        $("budgetProgress").style.width = "0%";
+        $("budgetMessage").textContent = "No budget set.";
+        return;
+    }
+
+    const percentage = Math.min(
+        (spent / monthlyBudget) * 100,
+        100
+    );
+
+    $("budgetProgress").style.width = `${percentage}%`;
+
+    if (spent > monthlyBudget) {
+        $("budgetProgress").style.background = "#ef4444";
+
+        $("budgetMessage").textContent =
+            "Warning! You have exceeded your monthly budget.";
+    } else if (percentage >= 80) {
+        $("budgetProgress").style.background = "#f59e0b";
+
+        $("budgetMessage").textContent =
+            "Warning! You are approaching your budget limit.";
+    } else {
+        $("budgetProgress").style.background = "#22b573";
+
+        $("budgetMessage").textContent =
+            "You are within your monthly budget.";
+    }
+}
+
+
+// =================================
+// Set Budget
+// =================================
+
+function setBudget() {
+    const input = prompt("Enter your monthly budget:");
+
+    if (input === null) return;
+
+    const value = Number(input);
+
+    if (!Number.isFinite(value) || value < 0) {
+        alert("Please enter a valid budget.");
+        return;
+    }
+
+    monthlyBudget = value;
+
+    updateDashboard();
+}
+
+
+// =================================
+// Spending by Category
+// =================================
+
+function renderCategorySpending() {
+    const expenses = transactions.filter(
+        t => t.type === "expense"
+    );
+
+    const container = $("categorySpending");
+
+    if (expenses.length === 0) {
+        container.innerHTML = `
+            <p class="empty-analytics">
+                No expense data available.
+            </p>
+        `;
+        return;
+    }
+
+    const categoryTotals = {};
+
+    expenses.forEach(transaction => {
+        categoryTotals[transaction.category] =
+            (categoryTotals[transaction.category] || 0)
+            + transaction.amount;
+    });
+
+    const maxAmount = Math.max(
+        ...Object.values(categoryTotals)
+    );
+
+    container.innerHTML = Object.entries(categoryTotals)
+        .sort((a, b) => b[1] - a[1])
+        .map(([category, amount]) => {
+            const percentage = (amount / maxAmount) * 100;
+
+            return `
+                <div class="category-item">
+                    <div class="category-info">
+                        <span>${escapeHTML(category)}</span>
+                        <strong>${money(amount)}</strong>
+                    </div>
+
+                    <div class="category-track">
+                        <div
+                            class="category-bar"
+                            style="width:${percentage}%"
+                        ></div>
+                    </div>
+                </div>
+            `;
+        })
+        .join("");
+}
+
+
+// =================================
+// Budget Event Listener
+// =================================
+
+$("setBudgetBtn").addEventListener("click", setBudget);
+
