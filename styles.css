@@ -1,8 +1,4 @@
 
-/* ================================
-   Global Styles
-================================ */
-
 * {
     box-sizing: border-box;
     margin: 0;
@@ -32,10 +28,6 @@ button {
     margin: 0 auto;
     padding: 20px 24px;
 }
-
-/* ================================
-   Header
-================================ */
 
 .page-header {
     display: flex;
@@ -76,10 +68,6 @@ button {
     background: #22a65b;
     color: white;
 }
-
-/* ================================
-   Summary Cards
-================================ */
 
 .summary-grid {
     display: grid;
@@ -128,11 +116,8 @@ button {
 .summary-card strong {
     font-size: 24px;
     color: #111827;
+    overflow-wrap: anywhere;
 }
-
-/* ================================
-   Panels
-================================ */
 
 .panel {
     background: white;
@@ -163,10 +148,6 @@ button {
     color: #3498db;
     border: 1px solid #3498db;
 }
-
-/* ================================
-   Budget Section
-================================ */
 
 .budget-meta {
     display: flex;
@@ -201,10 +182,6 @@ button {
     margin-top: 8px;
 }
 
-/* ================================
-   Form
-================================ */
-
 .form-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -216,6 +193,7 @@ button {
     display: flex;
     flex-direction: column;
     gap: 7px;
+    min-width: 0;
 }
 
 .form-group label {
@@ -240,24 +218,44 @@ button {
     box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.12);
 }
 
+.form-group input[type="search"] {
+    appearance: none;
+}
+
 .primary-btn {
     background: #3498db;
     color: white;
 }
 
-/* ================================
-   Filters
-================================ */
+.form-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.cancel-btn {
+    background: #e5e7eb;
+    color: #374151;
+}
+
+.cancel-btn:hover {
+    background: #d1d5db;
+}
+
+[hidden] {
+    display: none !important;
+}
+
+.primary-btn,
+.cancel-btn {
+    min-height: 46px;
+}
 
 .filter-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 18px;
 }
-
-/* ================================
-   Transactions Table
-================================ */
 
 .transaction-panel {
     overflow: hidden;
@@ -288,6 +286,11 @@ td {
 th {
     font-weight: 600;
     color: #111827;
+    white-space: nowrap;
+}
+
+tbody tr:hover {
+    background: #f9fafb;
 }
 
 .empty-state {
@@ -296,117 +299,6 @@ th {
     color: #9ca3af;
     vertical-align: middle;
 }
-
-/* ================================
-   Analytics
-================================ */
-
-.analytics-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 26px;
-}
-
-.analytics-grid .panel {
-    margin-bottom: 26px;
-}
-
-.empty-analytics {
-    color: #6b7280;
-}
-
-.statistics-list {
-    display: flex;
-    flex-direction: column;
-}
-
-.stat-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 15px;
-    padding: 13px 0;
-    border-bottom: 1px solid #e5e7eb;
-}
-
-.stat-row span {
-    color: #6b7280;
-}
-
-.stat-row strong {
-    color: #111827;
-}
-
-/* ================================
-   Responsive Design
-================================ */
-
-@media (max-width: 1000px) {
-
-    .summary-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
-    .form-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
-    .filter-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
-}
-
-@media (max-width: 650px) {
-
-    .container {
-        padding: 15px;
-    }
-
-    .page-header {
-        flex-direction: column;
-    }
-
-    .page-header h1 {
-        font-size: 28px;
-    }
-
-    .summary-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .form-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .filter-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .analytics-grid {
-        grid-template-columns: 1fr;
-        gap: 0;
-    }
-
-    .panel {
-        padding: 18px;
-    }
-
-    .budget-meta {
-        flex-direction: column;
-        gap: 8px;
-    }
-
-    .panel-heading {
-        align-items: flex-start;
-    }
-
-}
-
-
-/* =================================
-   COMMIT 2: TRANSACTION ACTIONS
-================================= */
 
 .type-badge {
     display: inline-block;
@@ -446,6 +338,7 @@ td.expense {
     border: none;
     border-radius: 5px;
     font-size: 13px;
+    white-space: nowrap;
 }
 
 .edit-btn {
@@ -458,11 +351,41 @@ td.expense {
     background: #fee2e2;
 }
 
+.analytics-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 26px;
+}
 
+.analytics-grid .panel {
+    margin-bottom: 26px;
+}
 
-/* =================================
-   COMMIT 3: CATEGORY SPENDING
-================================= */
+.empty-analytics {
+    color: #6b7280;
+}
+
+.statistics-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    padding: 13px 0;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.stat-row span {
+    color: #6b7280;
+}
+
+.stat-row strong {
+    color: #111827;
+}
 
 .category-item {
     margin-bottom: 18px;
@@ -490,70 +413,50 @@ td.expense {
     transition: width 0.3s ease;
 }
 
-
-
-/* =================================
-   COMMIT 5: FINAL POLISH
-================================= */
-
-.form-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-}
-
-.cancel-btn {
-    background: #e5e7eb;
-    color: #374151;
-}
-
-.cancel-btn:hover {
-    background: #d1d5db;
-}
-
-[hidden] {
-    display: none !important;
-}
-
-/* Better button alignment */
-.primary-btn,
-.cancel-btn {
-    min-height: 46px;
-}
-
-/* Better table readability */
-tbody tr:hover {
-    background: #f9fafb;
-}
-
-/* =================================
-   Responsive Improvements
-================================= */
-
-@media (max-width: 900px) {
-
-    .container {
-        max-width: 100%;
-    }
-
+@media (max-width: 1000px) {
     .summary-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .form-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .filter-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 900px) {
+    .container {
+        max-width: 100%;
     }
 
     .analytics-grid {
         grid-template-columns: 1fr;
     }
-
 }
 
-@media (max-width: 600px) {
+@media (max-width: 650px) {
+    .container {
+        padding: 15px;
+    }
 
     .page-header {
+        flex-direction: column;
         align-items: stretch;
+    }
+
+    .page-header h1 {
+        font-size: 28px;
     }
 
     .export-btn {
         width: 100%;
+    }
+
+    .summary-grid {
+        grid-template-columns: 1fr;
     }
 
     .summary-card {
@@ -564,12 +467,27 @@ tbody tr:hover {
         font-size: 21px;
     }
 
+    .form-grid,
+    .filter-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .panel {
+        padding: 18px;
+    }
+
     .panel-heading {
+        align-items: flex-start;
         flex-wrap: wrap;
     }
 
     .panel-heading button {
         width: 100%;
+    }
+
+    .budget-meta {
+        flex-direction: column;
+        gap: 8px;
     }
 
     .form-actions button {
@@ -584,10 +502,12 @@ tbody tr:hover {
         min-width: 850px;
     }
 
+    .analytics-grid {
+        gap: 0;
+    }
 }
 
 @media (max-width: 400px) {
-
     .page-header h1 {
         font-size: 24px;
     }
@@ -599,5 +519,4 @@ tbody tr:hover {
     .summary-icon {
         font-size: 28px;
     }
-
 }

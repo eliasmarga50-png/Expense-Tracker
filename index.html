@@ -4,37 +4,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Expense Tracker | Financial Dashboard</title>
-
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-
     <main class="container">
-
-        <!-- Header -->
         <header class="page-header">
             <div class="header-content">
-                <h1>
-                    <span class="title-icon">💰</span>
-                    Expense Tracker
-                </h1>
-
+                <h1><span class="title-icon">💰</span> Expense Tracker</h1>
                 <p>Manage your income, expenses and budget</p>
             </div>
-
-            <button class="btn export-btn" id="exportBtn">
-                📤 Export CSV
-            </button>
+            <button class="btn export-btn" id="exportBtn">📤 Export CSV</button>
         </header>
 
-        <!-- Financial Summary -->
         <section class="summary-grid">
-
             <article class="summary-card income-card">
                 <div class="summary-icon">💵</div>
-
                 <div>
                     <p>Total Income</p>
                     <strong id="totalIncome">$0.00</strong>
@@ -43,7 +28,6 @@
 
             <article class="summary-card expense-card">
                 <div class="summary-icon">💸</div>
-
                 <div>
                     <p>Total Expenses</p>
                     <strong id="totalExpenses">$0.00</strong>
@@ -52,7 +36,6 @@
 
             <article class="summary-card balance-card">
                 <div class="summary-icon">🏦</div>
-
                 <div>
                     <p>Balance</p>
                     <strong id="balance">$0.00</strong>
@@ -61,86 +44,50 @@
 
             <article class="summary-card budget-card">
                 <div class="summary-icon">🎯</div>
-
                 <div>
                     <p>Monthly Budget</p>
                     <strong id="budgetAmount">$0.00</strong>
                 </div>
             </article>
-
         </section>
 
-        <!-- Monthly Budget -->
         <section class="panel budget-panel">
-
             <div class="panel-heading">
                 <h2>Monthly Budget</h2>
-
-                <button class="btn outline-btn" id="setBudgetBtn">
-                    Set Budget
-                </button>
+                <button class="btn outline-btn" id="setBudgetBtn">Set Budget</button>
             </div>
 
             <div class="budget-meta">
-                <span>
-                    Spent:
-                    <strong id="budgetSpent">$0.00</strong>
-                </span>
-
-                <span>
-                    Remaining:
-                    <strong id="budgetRemaining">$0.00</strong>
-                </span>
+                <span>Spent: <strong id="budgetSpent">$0.00</strong></span>
+                <span>Remaining: <strong id="budgetRemaining">$0.00</strong></span>
             </div>
 
             <div class="progress-track">
                 <div class="progress-fill" id="budgetProgress"></div>
             </div>
 
-            <p class="budget-message" id="budgetMessage">
-                No budget set.
-            </p>
-
+            <p class="budget-message" id="budgetMessage">No budget set.</p>
         </section>
 
-        <!-- Add Transaction -->
         <section class="panel form-panel">
-
-            <h2>Add Transaction</h2>
+            <h2 id="formTitle">Add Transaction</h2>
 
             <form id="transactionForm">
-
                 <input type="hidden" id="editingId">
 
                 <div class="form-grid">
-
                     <div class="form-group">
                         <label for="description">Description</label>
-
-                        <input
-                            type="text"
-                            id="description"
-                            placeholder="e.g. Grocery shopping"
-                            required
-                        >
+                        <input type="text" id="description" placeholder="e.g. Grocery shopping" maxlength="100" required>
                     </div>
 
                     <div class="form-group">
                         <label for="amount">Amount</label>
-
-                        <input
-                            type="number"
-                            id="amount"
-                            placeholder="0.00"
-                            min="0.01"
-                            step="0.01"
-                            required
-                        >
+                        <input type="number" id="amount" placeholder="0.00" min="0.01" step="0.01" required>
                     </div>
 
                     <div class="form-group">
                         <label for="type">Type</label>
-
                         <select id="type">
                             <option value="expense">Expense</option>
                             <option value="income">Income</option>
@@ -149,23 +96,16 @@
 
                     <div class="form-group">
                         <label for="category">Category</label>
-
-                        <select id="category"></select>
+                        <select id="category" required></select>
                     </div>
 
                     <div class="form-group">
                         <label for="date">Date</label>
-
-                        <input
-                            type="date"
-                            id="date"
-                            required
-                        >
+                        <input type="date" id="date" required>
                     </div>
 
                     <div class="form-group">
                         <label for="paymentMethod">Payment Method</label>
-
                         <select id="paymentMethod">
                             <option value="Cash">Cash</option>
                             <option value="Bank">Bank</option>
@@ -174,50 +114,26 @@
                             <option value="Other">Other</option>
                         </select>
                     </div>
-
                 </div>
 
                 <div class="form-actions">
-
-    <button type="submit" class="btn primary-btn" id="submitBtn">
-        Add Transaction
-    </button>
-
-    <button
-        type="button"
-        class="btn cancel-btn"
-        id="cancelEditBtn"
-        hidden
-    >
-        Cancel Edit
-    </button>
-
-</div>
-
+                    <button type="submit" class="btn primary-btn" id="submitBtn">Add Transaction</button>
+                    <button type="button" class="btn cancel-btn" id="cancelEditBtn" hidden>Cancel Edit</button>
+                </div>
             </form>
-
         </section>
 
-        <!-- Transaction Filters -->
         <section class="panel filter-panel">
-
             <h2>Transactions</h2>
 
             <div class="filter-grid">
-
                 <div class="form-group">
                     <label for="searchInput">Search</label>
-
-                    <input
-                        type="search"
-                        id="searchInput"
-                        placeholder="Search transactions..."
-                    >
+                    <input type="search" id="searchInput" placeholder="Search transactions...">
                 </div>
 
                 <div class="form-group">
                     <label for="typeFilter">Type</label>
-
                     <select id="typeFilter">
                         <option value="all">All</option>
                         <option value="income">Income</option>
@@ -227,7 +143,6 @@
 
                 <div class="form-group">
                     <label for="categoryFilter">Category</label>
-
                     <select id="categoryFilter">
                         <option value="all">All Categories</option>
                     </select>
@@ -235,7 +150,6 @@
 
                 <div class="form-group">
                     <label for="sortFilter">Sort By</label>
-
                     <select id="sortFilter">
                         <option value="newest">Newest First</option>
                         <option value="oldest">Oldest First</option>
@@ -244,18 +158,12 @@
                         <option value="az">Description A-Z</option>
                     </select>
                 </div>
-
             </div>
-
         </section>
 
-        <!-- Transaction Table -->
         <section class="panel transaction-panel">
-
             <div class="table-container">
-
                 <table>
-
                     <thead>
                         <tr>
                             <th>Description</th>
@@ -267,79 +175,55 @@
                             <th>Actions</th>
                         </tr>
                     </thead>
-
                     <tbody id="transactionTableBody">
-
                         <tr>
-                            <td colspan="7" class="empty-state">
-                                No transactions found.
-                            </td>
+                            <td colspan="7" class="empty-state">No transactions found.</td>
                         </tr>
-
                     </tbody>
-
                 </table>
-
             </div>
-
         </section>
 
-        <!-- Analytics -->
         <section class="analytics-grid">
-
             <article class="panel spending-panel">
                 <h2>Spending by Category</h2>
-
                 <div id="categorySpending">
-                    <p class="empty-analytics">
-                        No expense data available.
-                    </p>
+                    <p class="empty-analytics">No expense data available.</p>
                 </div>
             </article>
 
             <article class="panel statistics-panel">
                 <h2>Financial Statistics</h2>
-
                 <div class="statistics-list">
-
                     <div class="stat-row">
                         <span>Total Transactions</span>
                         <strong id="totalTransactions">0</strong>
                     </div>
-
                     <div class="stat-row">
                         <span>Income Transactions</span>
                         <strong id="incomeTransactions">0</strong>
                     </div>
-
                     <div class="stat-row">
                         <span>Expense Transactions</span>
                         <strong id="expenseTransactions">0</strong>
                     </div>
-
                     <div class="stat-row">
                         <span>Average Expense</span>
                         <strong id="averageExpense">$0.00</strong>
                     </div>
-
                     <div class="stat-row">
                         <span>Highest Expense</span>
                         <strong id="highestExpense">$0.00</strong>
                     </div>
-
                     <div class="stat-row">
                         <span>Lowest Expense</span>
                         <strong id="lowestExpense">$0.00</strong>
                     </div>
-
                 </div>
             </article>
-
         </section>
-
     </main>
 
     <script src="script.js"></script>
-
 </body>
 </html>
