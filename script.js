@@ -1,117 +1,249 @@
 
 /* =================================
-   Expense Tracker
-   Commit 1: Application Foundation
+   COMMIT 2: TRANSACTION MANAGEMENT
 ================================= */
 
-// Transaction data will be stored in this JavaScript array.
-let transactions = [];
+// Create a transaction.
+function addTransaction(event) {
+    event.preventDefault();
 
-// Monthly budget.
-let monthlyBudget = 0;
-
-// ID generator for transactions.
-let nextId = 1;
-
-
-// =================================
-// Categories
-// =================================
-
-const expenseCategories = [
-    "Food",
-    "Transport",
-    "Education",
-    "Housing",
-    "Health",
-    "Entertainment",
-    "Shopping",
-    "Utilities",
-    "Business",
-    "Other"
-];
-
-const incomeCategories = [
-    "Salary",
-    "Business",
-    "Freelance",
-    "Investment",
-    "Gift",
-    "Other"
-];
-
-
-// =================================
-// DOM Helper
-// =================================
-
-const $ = (id) => document.getElementById(id);
-
-
-// =================================
-// Formatting
-// =================================
-
-function money(amount) {
-    return "$" + Number(amount || 0).toLocaleString("en-US", {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-    });
-}
-
-
-// =================================
-// Date Initialization
-// =================================
-
-function setTodayDate() {
-    const today = new Date();
-
-    const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, "0");
-    const day = String(today.getDate()).padStart(2, "0");
-
-    $("date").value = `${year}-${month}-${day}`;
-}
-
-
-// =================================
-// Category Initialization
-// =================================
-
-function populateCategories() {
+    const description = $("description").value.trim();
+    const amount = Number($("amount").value);
     const type = $("type").value;
+    const category = $("category").value;
+    const date = $("date").value;
+    const paymentMethod = $("paymentMethod").value;
+    const editingId = $("editingId").value;
 
-    const categories = type === "income"
-        ? incomeCategories
-        : expenseCategories;
+    if (!description) {
+        alert("Please enter a transaction description.");
+        return;
+    }
 
-    $("category").innerHTML = categories
-        .map(category => `
-            <option value="${category}">
-                ${category}
-            </option>
+    if (!Number.isFinite(amount) || amount <= 0) {
+        alert("Please enter an amount greater than zero.");
+        return;
+    }
+
+    if (!date) {
+        alert("Please select a transaction date.");
+        return;
+    }
+
+    const transactionData = {
+        description,
+        amount,
+        type,
+        category,
+        date,
+        paymentMethod
+    };
+
+    // Editing an existing transaction.
+    if (editingId) {
+        const transaction = transactions.find(
+            t => t.id === Number(editingId)
+        );
+
+        if (transaction) {
+            Object.assign(transaction, transactionData);
+        }
+
+        $("submitBtn").textContent = "Add Transaction";
+        $("editingId").value = "";
+    } else {
+        // Adding a new transaction.
+        transactions.push({
+            id: nextId++,
+            ...transactionData
+        });
+    }
+
+    $("transactionForm").reset();
+
+    setTodayDate();
+    populateCategories();
+
+    renderTransactions();
+    updateDashboard();
+
+    console.log("Transaction saved:", transactionData);
+}
+
+
+// =================================
+// Render Transactions
+// =================================
+
+function renderTransactions() {
+    const tbody = $("transactionTableBody");
+
+    if (transactions.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="7" class="empty-state">
+                    No transactions found.
+                </td>
+            </tr>
+        `;
+        return;
+    }
+
+    tbody.innerHTML = transactions
+        .map(transaction => `
+            <tr>
+                <td>${escapeHTML(transaction.description)}</td>
+
+                <td>
+                    <span class="type-badge ${transaction.type}">
+                        ${transaction.type}
+                    </span>
+                </td>
+
+                <td>${escapeHTML(transaction.category)}</td>
+
+                <td class="${transaction.type}">
+                    ${transaction.type === "income" ? "+" : "-"}
+                    ${money(transaction.amount)}
+                </td>
+
+                <td>${formatDate(transaction.date)}</td>
+
+                <td>${escapeHTML(transaction.paymentMethod)}</td>
+
+                <td>
+                    <div class="action-buttons">
+                        <button
+                            class="action-btn edit-btn"
+                            data-action="edit"
+                            data-id="${transaction.id}"
+                        >
+                            Edit
+                        </button>
+
+                        <button
+                            class="action-btn delete-btn"
+                            data-action="delete"
+                            data-id="${transaction.id}"
+                        >
+                            Delete
+                        </button>
+                    </div>
+                </td>
+            </tr>
         `)
         .join("");
 }
 
 
 // =================================
-// Initial Application Setup
+// Edit Transaction
 // =================================
 
-function initializeApp() {
-    setTodayDate();
+function editTransaction(id) {
+    const transaction = transactions.find(
+        t => t.id === Number(id)
+    );
+
+    if (!transaction) return;
+
+    $("description").value = transaction.description;
+    $("amount").value = transaction.amount;
+    $("type").value = transaction.type;
+
     populateCategories();
 
-    $("type").addEventListener("change", populateCategories);
+    $("category").value = transaction.category;
+    $("date").value = transaction.date;
+    $("paymentMethod").value = transaction.paymentMethod;
+    $("editingId").value = transaction.id;
 
-    console.log("Expense Tracker initialized.");
+    $("submitBtn").textContent = "Update Transaction";
+
+    $("transactionForm").scrollIntoView({
+        behavior: "smooth",
+        block: "center"
+    });
 }
 
 
 // =================================
-// Start Application
+// Delete Transaction
 // =================================
 
-initializeApp();
+function deleteTransaction(id) {
+    const confirmed = confirm(
+        "Are you sure you want to delete this transaction?"
+    );
+
+    if (!confirmed) return;
+
+    transactions = transactions.filter(
+        t => t.id !== Number(id)
+    );
+
+    renderTransactions();
+    updateDashboard();
+}
+
+
+// =================================
+// Table Event Delegation
+// =================================
+
+function handleTransactionAction(event) {
+    const button = event.target.closest("button[data-action]");
+
+    if (!button) return;
+
+    const id = Number(button.dataset.id);
+    const action = button.dataset.action;
+
+    if (action === "edit") {
+        editTransaction(id);
+    }
+
+    if (action === "delete") {
+        deleteTransaction(id);
+    }
+}
+
+
+// =================================
+// Utility Functions
+// =================================
+
+function escapeHTML(value) {
+    return String(value).replace(/[&<>"']/g, character => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+    })[character]);
+}
+
+function formatDate(dateString) {
+    const date = new Date(dateString + "T00:00:00");
+
+    return date.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric"
+    });
+}
+
+
+// =================================
+// Commit 2 Event Listeners
+// =================================
+
+$("transactionForm").addEventListener(
+    "submit",
+    addTransaction
+);
+
+$("transactionTableBody").addEventListener(
+    "click",
+    handleTransactionAction
+);

@@ -402,3 +402,58 @@ th {
     }
 
 }
+
+
+/* =================================
+   COMMIT 2: TRANSACTION ACTIONS
+================================= */
+
+.type-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 20px;
+    text-transform: capitalize;
+    font-size: 13px;
+}
+
+.type-badge.income {
+    color: #15803d;
+    background: #dcfce7;
+}
+
+.type-badge.expense {
+    color: #b91c1c;
+    background: #fee2e2;
+}
+
+td.income {
+    color: #16a34a;
+    font-weight: 600;
+}
+
+td.expense {
+    color: #dc2626;
+    font-weight: 600;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 7px;
+}
+
+.action-btn {
+    padding: 6px 10px;
+    border: none;
+    border-radius: 5px;
+    font-size: 13px;
+}
+
+.edit-btn {
+    color: #1d4ed8;
+    background: #dbeafe;
+}
+
+.delete-btn {
+    color: #b91c1c;
+    background: #fee2e2;
+}
