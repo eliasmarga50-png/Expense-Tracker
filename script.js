@@ -439,3 +439,351 @@ function renderCategorySpending() {
 
 $("setBudgetBtn").addEventListener("click", setBudget);
 
+
+
+/* =================================
+   COMMIT 4: FILTER & SORT
+================================= */
+
+function getFilteredTransactions() {
+    const search = $("searchInput").value.toLowerCase().trim();
+    const type = $("typeFilter").value;
+    const category = $("categoryFilter").value;
+    const sort = $("sortFilter").value;
+
+    let filtered = [...transactions];
+
+    // Search
+    if (search) {
+        filtered = filtered.filter(t =>
+            t.description.toLowerCase().includes(search)
+            || t.category.toLowerCase().includes(search)
+            || t.paymentMethod.toLowerCase().includes(search)
+        );
+    }
+
+    // Type filter
+    if (type !== "all") {
+        filtered = filtered.filter(t => t.type === type);
+    }
+
+    // Category filter
+    if (category !== "all") {
+        filtered = filtered.filter(t => t.category === category);
+    }
+
+    // Sorting
+    switch (sort) {
+        case "newest":
+            filtered.sort((a, b) => b.date.localeCompare(a.date));
+            break;
+
+        case "oldest":
+            filtered.sort((a, b) => a.date.localeCompare(b.date));
+            break;
+
+        case "high-low":
+            filtered.sort((a, b) => b.amount - a.amount);
+            break;
+
+        case "low-high":
+            filtered.sort((a, b) => a.amount - b.amount);
+            break;
+
+        case "az":
+            filtered.sort((a, b) =>
+                a.description.localeCompare(b.description)
+            );
+            break;
+    }
+
+    return filtered;
+}
+
+
+// =================================
+// Update Category Filter
+// =================================
+
+function updateCategoryFilter() {
+    const selected = $("categoryFilter").value;
+
+    const allCategories = [
+        ...new Set([
+            ...expenseCategories,
+            ...incomeCategories,
+            ...transactions.map(t => t.category)
+        ])
+    ];
+
+    $("categoryFilter").innerHTML =
+        '<option value="all">All Categories</option>'
+        + allCategories.map(category => `
+            <option value="${escapeHTML(category)}">
+                ${escapeHTML(category)}
+            </option>
+        `).join("");
+
+    if (allCategories.includes(selected)) {
+        $("categoryFilter").value = selected;
+    }
+}
+
+
+/* =================================
+   COMMIT 5: CSV EXPORT
+================================= */
+
+function exportCSV() {
+    if (transactions.length === 0) {
+        alert("There are no transactions to export.");
+        return;
+    }
+
+    const headers = [
+        "Description",
+        "Type",
+        "Category",
+        "Amount",
+        "Date",
+        "Payment Method"
+    ];
+
+    const rows = transactions.map(transaction => [
+        transaction.description,
+        transaction.type,
+        transaction.category,
+        transaction.amount.toFixed(2),
+        transaction.date,
+        transaction.paymentMethod
+    ]);
+
+    // Escape values safely for CSV.
+    const escapeCSV = value => {
+        const text = String(value ?? "");
+
+        return `"${text.replace(/"/g, '""')}"`;
+    };
+
+    const csvContent = [
+        headers.map(escapeCSV).join(","),
+        ...rows.map(row => row.map(escapeCSV).join(","))
+    ].join("\n");
+
+    // UTF-8 BOM improves Excel compatibility.
+    const blob = new Blob(
+        ["\uFEFF" + csvContent],
+        {
+            type: "text/csv;charset=utf-8;"
+        }
+    );
+
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+
+    link.href = url;
+    link.download = "expense-tracker-transactions.csv";
+
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+    URL.revokeObjectURL(url);
+}
+
+
+// =================================
+// Cancel Edit
+// =================================
+
+function cancelEdit() {
+    $("transactionForm").reset();
+
+    $("editingId").value = "";
+    $("submitBtn").textContent = "Add Transaction";
+
+    $("cancelEditBtn").hidden = true;
+
+    setTodayDate();
+    populateCategories();
+}
+
+
+// =================================
+// Update Edit Function
+// =================================
+
+// Add the cancel button when editing.
+
+const originalEditTransaction = editTransaction;
+
+editTransaction = function(id) {
+    originalEditTransaction(id);
+
+    $("cancelEditBtn").hidden = false;
+};
+
+
+// =================================
+// Update Transaction Function
+// =================================
+
+// Hide cancel button after saving.
+
+const originalAddTransaction = addTransaction;
+
+addTransaction = function(event) {
+    const wasEditing = $("editingId").value !== "";
+
+    originalAddTransaction(event);
+
+    if (wasEditing) {
+        $("cancelEditBtn").hidden = true;
+    }
+};
+
+
+// =================================
+// Export Event Listener
+// =================================
+
+$("exportBtn").addEventListener("click", exportCSV);
+
+
+// =================================
+// Cancel Edit Event Listener
+// =================================
+
+$("cancelEditBtn").addEventListener("click", cancelEdit);
+
+
+
+// =================================
+// Render Filtered Transactions
+// =================================
+
+function renderTransactions() {
+    const tbody = $("transactionTableBody");
+    const filtered = getFilteredTransactions();
+
+    if (filtered.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="7" class="empty-state">
+                    No transactions found.
+                </td>
+            </tr>
+        `;
+        return;
+    }
+
+    tbody.innerHTML = filtered.map(transaction => `
+        <tr>
+            <td>${escapeHTML(transaction.description)}</td>
+
+            <td>
+                <span class="type-badge ${transaction.type}">
+                    ${transaction.type}
+                </span>
+            </td>
+
+            <td>${escapeHTML(transaction.category)}</td>
+
+            <td class="${transaction.type}">
+                ${transaction.type === "income" ? "+" : "-"}
+                ${money(transaction.amount)}
+            </td>
+
+            <td>${formatDate(transaction.date)}</td>
+
+            <td>${escapeHTML(transaction.paymentMethod)}</td>
+
+            <td>
+                <div class="action-buttons">
+                    <button
+                        class="action-btn edit-btn"
+                        data-action="edit"
+                        data-id="${transaction.id}"
+                    >
+                        Edit
+                    </button>
+
+                    <button
+                        class="action-btn delete-btn"
+                        data-action="delete"
+                        data-id="${transaction.id}"
+                    >
+                        Delete
+                    </button>
+                </div>
+            </td>
+        </tr>
+    `).join("");
+}
+
+
+// =================================
+// Financial Statistics
+// =================================
+
+function updateStatistics() {
+    const incomeTransactions = transactions.filter(
+        t => t.type === "income"
+    );
+
+    const expenseTransactions = transactions.filter(
+        t => t.type === "expense"
+    );
+
+    const expenses = expenseTransactions.map(t => t.amount);
+
+    const totalExpenses = expenses.reduce(
+        (total, amount) => total + amount,
+        0
+    );
+
+    const averageExpense = expenses.length
+        ? totalExpenses / expenses.length
+        : 0;
+
+    const highestExpense = expenses.length
+        ? Math.max(...expenses)
+        : 0;
+
+    const lowestExpense = expenses.length
+        ? Math.min(...expenses)
+        : 0;
+
+    $("totalTransactions").textContent = transactions.length;
+
+    $("incomeTransactions").textContent =
+        incomeTransactions.length;
+
+    $("expenseTransactions").textContent =
+        expenseTransactions.length;
+
+    $("averageExpense").textContent =
+        money(averageExpense);
+
+    $("highestExpense").textContent =
+        money(highestExpense);
+
+    $("lowestExpense").textContent =
+        money(lowestExpense);
+}
+
+
+// =================================
+// Filter Event Listeners
+// =================================
+
+$("searchInput").addEventListener("input", renderTransactions);
+
+$("typeFilter").addEventListener("change", renderTransactions);
+
+$("categoryFilter").addEventListener("change", renderTransactions);
+
+$("sortFilter").addEventListener("change", renderTransactions);
+
+
